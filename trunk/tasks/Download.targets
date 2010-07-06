@@ -156,8 +156,7 @@ public class Download : Microsoft.Build.Utilities.Task
              continue;
 
            dir = Path.GetFullPath(Path.Combine(toDir, dir));
-           
-           Log.LogMessage("Removing? {0}", dir);
+
            if (Directory.Exists(dir))
            {
              Log.LogMessage("Removing {0}", dir);
