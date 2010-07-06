@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetName>zlib</TargetName>
+    <OutputPath>../requirements/zlib</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <Target Name="Build" DependsOnTargets="">
+    <PropertyGroup>
+      <PlatformProps Condition="'$(Platform)' == 'Win32'">LOC="-DASMV -DASMINF" OBJA="inffas32.obj match686.obj"</PlatformProps>
+      <PlatformProps Condition="'$(Platform)' == 'x64'">AS=ml64 LOC="-DASMV -DASMINF -I${zlibDir}" OBJA="inffasx64.obj gvmat64.obj inffas8664.obj"</PlatformProps>
+    </PropertyGroup>
+    <Exec
+      WorkingDirectory="../requirements/zlib"
+      Command='nmake.exe /nologo /S /F win32/Makefile.msc $(PlatformProps)'
+      />
+  </Target>
+</Project>
