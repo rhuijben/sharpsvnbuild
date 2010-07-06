@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetName>httpd</TargetName>
+    <OutputPath>requirements/httpd</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="../tasks/FixEols.targets"/>
+  <Import Project="../tasks/Replace.targets"/>
+
+  <ItemGroup>
+    <OldProjects Include="..\requirements\httpd\**\*.dsp" />
+    <OldProjects Include="..\requirements\httpd\**\*.dsp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AprProj Include="..\requirements\httpd\srclib\apr\apr.vcxproj" />
+    
+    <AprProj Include="..\requirements\httpd\srclib\apr-iconv\build\preapriconv.vcxproj" />
+    <AprProj Include="..\requirements\httpd\srclib\apr-iconv\apriconv.vcxproj" />
+    <AprProj Include="..\requirements\httpd\srclib\apr-iconv\ccs\apriconv_ccs_modules.vcxproj" />
+    <AprProj Include="..\requirements\httpd\srclib\apr-iconv\ces\apriconv_ces_modules.vcxproj" />
+    
+    <AprProj Include="..\requirements\httpd\srclib\apr-util\xml\expat\lib\xml.vcxproj" />
+    <AprProj Include="..\requirements\httpd\srclib\apr-util\aprutil.vcxproj" />
+  </ItemGroup>
+
+  <Target Name="Build" DependsOnTargets="">
+    <Exec WorkingDirectory="../requirements/httpd"
+          Command="..\perl\perl.exe srclib\apr\build\cvtdsp.pl -2005 -mt" />
+    <!-- The projects in httpd and apr all have \n instead of \r\n -->
+    <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
+    
+    <Exec WorkingDirectory="../requirements/httpd" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
+          Command="vcupgrade.exe /nologo %(OldProjects.fullpath)" />
+
+    <MSBuild Projects="@(AprProj)" />
+  </Target>
+</Project>
