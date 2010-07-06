@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="FixEols" TaskFactory="CodeTaskFactory" 
+      AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <Targets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.v4.0.dll"/>
+      <Code Type="Class" Language="cs">
+<![CDATA[
+using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class FixEols : Microsoft.Build.Utilities.Task
+{
+    [Required]
+    public ITaskItem[] Targets { get; set; }
+
+    public override bool Execute()
+    {
+      foreach(ITaskItem i in Targets)
+      {
+         string text = File.ReadAllText(i.ItemSpec);
+         text = text.Replace("\r", "");
+         text = text.Replace("\n", "\r\n");
+         File.WriteAllText(i.ItemSpec, text);
+      }
+      return true;
+    }
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>

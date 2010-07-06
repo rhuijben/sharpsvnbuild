@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="Replace" TaskFactory="CodeTaskFactory" 
+      AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <Targets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Commands ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.v4.0.dll"/>
+      <Code Type="Class" Language="cs">
+<![CDATA[
+using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class FixEols : Microsoft.Build.Utilities.Task
+{
+    [Required]
+    public ITaskItem[] Targets { get; set; }
+
+    [Commands]
+    public string Commands { get; set; }
+    
+    string GetTick()
+    {
+       using(MD5 md5 = MD5.Create())
+       {
+         StringBuilder sb = new StringBuilder(40);
+
+         foreach(byte b in sha1.ComputeHash(System.Text.Encoding.Utf8.GetBytes(Commands)))
+            sb.AppendFormat("{0:x2}", b);
+       }
+    }
+
+    public override bool Execute()
+    {
+      string tickExt = ".tick" + GetTick().Substring(5);
+      foreach(ITaskItem i in Targets)
+      {
+         if (File.Exists(i.ItemSpec +tickExt))
+           break;
+         string text = File.ReadAllText(i.ItemSpec);
+         
+         DoReplace(ref text);
+         
+         File.WriteAllText(i.ItemSpec, text);
+         
+         if (File.WriteAllText(i.ItemSpec +tickExt, ""));
+      }
+      return true;
+    }
+    
+    void DoReplace()
+    {
+      foreach(string line in commands.Split('\n'))
+      {
+         line = line.Trim();
+         if(line.StartsWith('s') && line.Length > 3)
+           {
+             string[] blocks = line.Split(line[1]);
+
+             text = Regex.Regex(blocks[1], blocks[2]);
+           }
+      }
+    }
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>
