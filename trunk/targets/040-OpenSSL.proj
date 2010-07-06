@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetName>openssl</TargetName>
+    <OutputPath>requirements/openssl</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <ZLibDir Include="..\requirements\zlib" />
+  </ItemGroup>
+
+  <Target Name="Build" DependsOnTargets="">
+    <PropertyGroup>
+      <ConfigArgs Condition="'$(Platform)' == 'Win32'">VC-WIN32</ConfigArgs>
+      <ConfigArgs Condition="'$(Platform)' == 'x64'">VC-WIN64A</ConfigArgs>
+      <ConfigArgs>$(ConfigArgs) -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_DEPRECATE</ConfigArgs>
+      <ConfigArgs>$(ConfigArgs) no-shared no-krb5 no-hw zlib enable-tlsext</ConfigArgs>
+      <ConfigArgs>$(ConfigArgs) --with-zlib-lib=../zlib/zlib.lib</ConfigArgs>
+      <ConfigArgs>$(ConfigArgs) --with-zlib-include=@(ZlibDir->'%(FullPath)')</ConfigArgs>
+      <PrepScript Condition="'$(Platform)' == 'Win32'">ms\do_ms.bat</PrepScript>
+      <PrepScript Condition="'$(Platform)' == 'x64'">ms\do_win64a.bat</PrepScript>
+    </PropertyGroup>
+    <Exec WorkingDirectory="../requirements/openssl"
+          Command="..\perl\perl.exe Configure $(ConfigArgs)" />
+    <Exec WorkingDirectory ="../requirements/openssl"
+          Command="cmd.exe /c $(PrepScript)" />
+    <Exec
+      WorkingDirectory="../requirements/openssl"
+      Command='nmake.exe /nologo /S /F ms\ntdll.mak'
+      />
+  </Target>
+</Project>
