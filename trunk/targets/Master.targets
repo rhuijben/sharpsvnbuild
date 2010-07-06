@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)\..\tasks\*.targets" />
+  <Target Name="Download">
+    <Download 
+        Condition="'%(Type)'=='download'"
+        ExpandTo="@(Package)"
+        Url="%(Url)"
+        DownloadCache="$(DownloadCache)"
+        Sha1="%(Sha1)"
+        TaskDir="$(MSBuildThisFileDirectory)\..\Tasks"
+        PackageRoot="@(Package->'%(PackageRoot)')"
+        PackageName="%(name)"
+        PackageVersion="%(version)"
+        Remove="@(Package->'%(Exclude)')"
+    />
+  </Target>
+   <Target Name="Build" DependsOnTargets="Download">
+  </Target>
+</Project>

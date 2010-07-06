@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="Download" TaskFactory="CodeTaskFactory" 
+      AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <ExpandTo ParameterType="System.String" Required="true" />
+      <Url ParameterType="System.String" Required="true" />
+      <DownloadCache ParameterType="System.String" Required="true" />
+      <Sha1 ParameterType="System.String" />
+      <TaskDir ParameterType="System.String" Required="true"/>
+      <PackageRoot ParameterType="System.String" />
+      <PackageName ParameterType="System.String" />
+      <PackageVersion ParameterType="System.String" />
+      <Remove ParameterType="System.String" />
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.v4.0.dll"/>
+      <Reference Include="$(MSBuildThisFileDirectory)\ICSharpCode.SharpZipLib.dll"/>
+      <Code Type="Class" Language="cs">
+<![CDATA[
+using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+using ICSharpCode.SharpZipLib.BZip2;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
+
+public class Download : Microsoft.Build.Utilities.Task
+{
+    [Microsoft.Build.Framework.Required]
+    public string ExpandTo { get; set; }
+    
+    [Microsoft.Build.Framework.Required]
+    public string Url { get; set; }
+    
+    [Microsoft.Build.Framework.Required]
+    public string DownloadCache { get; set; }
+    
+    //[Microsoft.Build.Framework.Required]
+    public string Sha1 { get; set; }
+    
+    public string PackageRoot { get; set; }
+    
+    public string PackageName { get; set; }
+    public string PackageVersion { get; set; }
+    
+    public string Remove { get; set; }
+    
+    static bool _loaded;
+    static string _assemblyDir;
+    [Required]
+    public string TaskDir
+    {
+      get { return _assemblyDir; }
+      set
+      {
+        if (!_loaded)
+        {
+          _assemblyDir = Path.GetFullPath(value);
+          AppDomain.CurrentDomain.AssemblyResolve += ZipResolver;
+          _loaded = true;
+        }
+      }
+    }
+    
+    static Assembly ZipResolver(object sender, ResolveEventArgs args)
+    {
+      AssemblyName nm = new AssemblyName(args.Name);
+      
+      if (nm.Name == "ICSharpCode.SharpZipLib")
+        return Assembly.LoadFrom(Path.Combine(_assemblyDir, nm.Name + ".dll"));
+        
+      return null;
+    }
+
+    string _toFile;
+
+    public override bool Execute()
+    {
+      if (!DownloadSrc())
+        return false;
+        
+      if (!ExtractSrc())
+        return false;
+
+      return true;
+    }
+
+    bool ExtractSrc()
+    {
+      string ext = Path.GetExtension(_toFile);
+      
+      if (Directory.Exists(ExpandTo))
+        return true;
+
+      if (string.Equals(ext, ".gz", StringComparison.OrdinalIgnoreCase)
+          || string.Equals(ext, ".bz2", StringComparison.OrdinalIgnoreCase))
+        ext = Path.GetExtension(Path.GetFileNameWithoutExtension(_toFile)) + ext;
+
+      bool ok;
+      switch (ext.ToLowerInvariant())
+      {
+        case ".zip":
+          ok = ExtractZip();
+          break;
+        case ".tar.gz":
+        case ".tgz":
+          ok = ExtractTar(new GZipInputStream(File.OpenRead(_toFile)));
+          break;
+        case ".tar.bz2":
+          ok = ExtractTar(new BZip2InputStream(File.OpenRead(_toFile)));
+          break;
+        default:
+          Log.LogError("Don't know how to extract {0}", _toFile);
+          return false;
+      }
+      
+      if (!ok)
+        return false;
+        
+      if (!string.IsNullOrEmpty(Remove))
+      {
+        string toDir = Path.GetFullPath(ExpandTo);
+        foreach(string sd in Remove.Split(';'))
+        {
+           string dir = sd.Trim();
+           
+           if (string.IsNullOrEmpty(dir))
+             continue;
+
+           dir = Path.GetFullPath(Path.Combine(toDir, dir));
+           
+           Log.LogMessage("Removing? {0}", dir);
+           if (Directory.Exists(dir))
+           {
+             Log.LogMessage("Removing {0}", dir);
+             Directory.Delete(dir, true);
+           }
+        }
+      }
+      return true;
+    }
+    
+    bool ExtractZip()
+    {
+      return true;
+    }
+    
+    bool ExtractTar(Stream inStream)
+    {
+      using(inStream)
+      {
+        string expandTo = Path.GetFullPath(ExpandTo);
+        Log.LogMessage("Extracting {0} to {1}", Path.GetFileName(_toFile), expandTo);
+        TarArchive archive = TarArchive.CreateInputTarArchive(inStream);
+        
+        string pkgRoot = PackageRoot ?? (PackageName + "-" + PackageVersion);
+        pkgRoot += '/';
+        
+        archive.ProgressMessageEvent += delegate(TarArchive sender, TarEntry entry, string msg)
+           {
+             if (entry.Name.StartsWith(pkgRoot, StringComparison.OrdinalIgnoreCase))
+               entry.Name = entry.Name.Substring(pkgRoot.Length);
+           };
+        
+        archive.ExtractContents(expandTo);
+      }
+      return true;
+    }
+
+    bool DownloadSrc()
+    {
+      string cache = Path.GetFullPath(DownloadCache);
+        
+      if (!Directory.Exists(cache))
+        Directory.CreateDirectory(cache);
+            
+      Uri uri;
+        
+      if (!Uri.TryCreate(Url, UriKind.Absolute, out uri)
+          || (uri.Scheme != "http" && uri.Scheme != "https"))
+      {
+        Log.LogError("{0} is not a valid download url", Url);
+        return false;
+      }
+      
+      string name = Url.Substring(Url.LastIndexOf('/')+1);
+      
+      string toFile = Path.Combine(cache, name);
+      _toFile = toFile;
+      
+      if (File.Exists(toFile))
+      {
+        string fileSha = Sha1OfFile(toFile);
+        if (string.Equals(fileSha, Sha1, StringComparison.OrdinalIgnoreCase))
+          return true; // Done
+          
+        if (!string.IsNullOrEmpty(toFile))
+        {
+          Log.LogMessage("Deleting {0}, Sha1 not {1}", toFile, fileSha);
+          File.Delete(toFile);
+        }
+        else
+        {
+          Log.LogError("Can't verify {0}, Sha1 not set (Found Sha1={1})", toFile, fileSha);
+          return false;
+        }
+      }
+
+      ExpandTo = Path.GetFullPath(ExpandTo);
+
+      if (Directory.Exists(ExpandTo))
+      {
+        Log.LogMessage("Removing {0}", ExpandTo);
+        Directory.Delete(ExpandTo, true);
+      }
+
+      Log.LogMessage("Downloading {0}", uri);
+
+      using (WebClient wc = new WebClient())
+        wc.DownloadFile(uri, toFile);
+      
+      string rsSha = Sha1OfFile(toFile);
+      
+      if (string.Equals(rsSha, Sha1, StringComparison.OrdinalIgnoreCase))
+        return true;
+      else
+      {
+        Log.LogError("Can't verify {0}, Sha1 not set to {1}", toFile, rsSha);
+        return false;
+      }
+    }
+    
+    public static string Sha1OfFile(string name)
+    {
+      using (FileStream file = File.OpenRead(name))
+      using (SHA1 sha1 = SHA1.Create())
+      {
+         StringBuilder sb = new StringBuilder(40);
+         
+         foreach(byte b in sha1.ComputeHash(file))
+            sb.AppendFormat("{0:x2}", b);
+            
+         return sb.ToString();
+      }
+    }
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>
