@@ -15,6 +15,14 @@
         Remove="@(Package->'%(Exclude)')"
     />
   </Target>
+  <ItemGroup>
+    <ProjectFile Include="$(MSBuildProjectDirectory)/targets/*-*.*proj" />
+  </ItemGroup>
    <Target Name="Build" DependsOnTargets="Download">
+     <MSBuild
+       Projects="@(ProjectFile)"
+       
+       Properties="Configuration=$(Configuration);Platform=$(Platform)"
+       />
   </Target>
 </Project>
