@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <OldProjects Include="..\requirements\httpd\**\*.dsp" />
-    <OldProjects Include="..\requirements\httpd\**\*.dsp" />
   </ItemGroup>
 
   <ItemGroup>
