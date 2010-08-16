@@ -51,6 +51,7 @@ using Microsoft.Build.Utilities;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.Zip;
 
 public class Download : Microsoft.Build.Utilities.Task
 {
@@ -109,7 +110,7 @@ public class Download : Microsoft.Build.Utilities.Task
         
       if (!ExtractSrc())
         return false;
-
+        
       return true;
     }
 
@@ -142,34 +143,19 @@ public class Download : Microsoft.Build.Utilities.Task
           return false;
       }
       
-      if (!ok)
-        return false;
-        
-      if (!string.IsNullOrEmpty(Remove))
-      {
-        string toDir = Path.GetFullPath(ExpandTo);
-        foreach(string sd in Remove.Split(';'))
-        {
-           string dir = sd.Trim();
-           
-           if (string.IsNullOrEmpty(dir))
-             continue;
-
-           dir = Path.GetFullPath(Path.Combine(toDir, dir));
-
-           if (Directory.Exists(dir))
-           {
-             Log.LogMessage("Removing {0}", dir);
-             Directory.Delete(dir, true);
-           }
-        }
-      }
-      return true;
+      return ok;
     }
     
     bool ExtractZip()
     {
-      return true;
+      FastZip fz = new FastZip();
+      
+      string expandTo = Path.GetFullPath(ExpandTo);
+      Log.LogMessage("Extracting {0} to {1}", Path.GetFileName(_toFile), expandTo);
+        
+      fz.ExtractZip(_toFile, expandTo, null);
+      
+      return DoRemove();
     }
     
     bool ExtractTar(Stream inStream)
@@ -190,6 +176,31 @@ public class Download : Microsoft.Build.Utilities.Task
            };
         
         archive.ExtractContents(expandTo);
+      }
+      
+      return DoRemove();
+    }
+    
+    bool DoRemove()
+    {
+      if (!string.IsNullOrEmpty(Remove))
+      {
+        string toDir = Path.GetFullPath(ExpandTo);
+        foreach(string sd in Remove.Split(';'))
+        {
+           string dir = sd.Trim();
+           
+           if (string.IsNullOrEmpty(dir))
+             continue;
+
+           dir = Path.GetFullPath(Path.Combine(toDir, dir));
+
+           if (Directory.Exists(dir))
+           {
+             Log.LogMessage("Removing {0}", dir);
+             Directory.Delete(dir, true);
+           }
+        }
       }
       return true;
     }
