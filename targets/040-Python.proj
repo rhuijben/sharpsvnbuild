@@ -3,6 +3,8 @@
   <ItemGroup>
     <OldProjects Include="..\requirements\python\pcbuild\*.vcproj" />
   </ItemGroup>
+  <Import Project="../tasks/FixEols.targets"/>
+  <Import Project="../tasks/Replace.targets"/>
 
   <ItemGroup>
     <PyProj Include="..\requirements\python\pcbuild\make_versioninfo.vcxproj" />
@@ -13,16 +15,21 @@
     <PyProj Include="..\requirements\python\pcbuild\python.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\pythonw.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\winsound.vcxproj" />
+    <PyProj Include="..\requirements\python\pcbuild\_ssl.vcxproj" />    
   </ItemGroup>
 
   <Target Name="Build" DependsOnTargets="">
     <!--FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/-->
     
+    <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
+    
     <Exec WorkingDirectory="../requirements/python" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
           Command="vcupgrade.exe /nologo %(OldProjects.fullpath)" />
-
+          
     <MSBuild Projects="@(PyProj)"
-             Properties="sqlite3Dir=..\..\sqlite">
-    </MSBuild>
+             Properties="sqlite3Dir=..\..\sqlite;
+                         opensslDir=..\..\openssl;
+                         PreBuildEventUseInBuild=false"
+    />
   </Target>
 </Project>

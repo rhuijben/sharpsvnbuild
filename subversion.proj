@@ -34,10 +34,10 @@
     </Package>
     <Package Include="$(BuildDir)/perl">
       <Name>Perl</Name>
-      <Version>5.13.2</Version>
+      <Version>5.12.1</Version>
       <Type>download</Type>
-      <Url>http://www.perl.com/CPAN/src/perl-5.13.2.tar.bz2</Url>
-      <Sha1>af0628653d3078a95bf9390b71688e0dc55e405f</Sha1>
+      <Url>http://www.cpan.org/src/5.0/perl-5.12.1.tar.gz</Url>
+      <Sha1>83b99f08379782dc06594a85eeb279edc5b0ca44</Sha1>
     </Package>
     <Package Include="$(BuildDir)/zlib">
       <Name>ZLib</Name>
@@ -69,10 +69,10 @@
     </Package>
     <Package Include="$(BuildDir)/httpd">
       <Name>httpd</Name>
-      <Version>2.2.15</Version>
+      <Version>2.2.16</Version>
       <Type>download</Type>
-      <Url>http://www.apache-mirror.com/httpd/httpd-2.2.15.tar.bz2</Url>
-      <Sha1>5f0e973839ed2e38a4d03adba109ef5ce3381bc2</Sha1>
+      <Url>http://www.eu.apache.org/dist/httpd/httpd-2.2.16.tar.bz2</Url>
+      <Sha1>ef92f5b3124fe5e9ba6121ea7f4bab8c014068f9</Sha1>
       <!-- srcdir contains packaged apr, apr-util -->
       <Exclude>srclib/apr;srclib/apr-util</Exclude>
     </Package>

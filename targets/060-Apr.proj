@@ -4,7 +4,6 @@
     <TargetName>httpd</TargetName>
     <OutputPath>requirements/httpd</OutputPath>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="../tasks/FixEols.targets"/>
   <Import Project="../tasks/Replace.targets"/>
 
@@ -31,7 +30,7 @@
     <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
     
     <Exec WorkingDirectory="../requirements/httpd" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
-          Command="vcupgrade.exe /nologo %(OldProjects.fullpath)" />
+          Command="vcupgrade.exe /nologo /nocolor %(OldProjects.fullpath)" />
 
     <MSBuild Projects="@(AprProj)" />
   </Target>
