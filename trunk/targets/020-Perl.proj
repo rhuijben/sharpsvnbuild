@@ -13,9 +13,9 @@
       <PlatformProps Condition="'$(Platform)' == 'Win32'">WIN64=undef ProcessorArchitecture=X86 ARCHITECTURE=x86</PlatformProps>
       <PlatformProps Condition="'$(Platform)' == 'x64'">WIN64</PlatformProps>
     </PropertyGroup>
-<!--    <Exec
+    <Exec
       WorkingDirectory="../requirements/perl/win32"
       Command='nmake.exe /nologo /S /F Makefile $(CommonProps) $(PlatformProps)'
-      />-->
+      />
   </Target>
 </Project>

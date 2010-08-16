@@ -11,14 +11,23 @@
       <ConfigArgs Condition="'$(Platform)' == 'Win32'">VC-WIN32</ConfigArgs>
       <ConfigArgs Condition="'$(Platform)' == 'x64'">VC-WIN64A</ConfigArgs>
       <ConfigArgs>$(ConfigArgs) -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_DEPRECATE</ConfigArgs>
-      <ConfigArgs>$(ConfigArgs) no-shared no-krb5 no-hw zlib enable-tlsext</ConfigArgs>
-      <ConfigArgs>$(ConfigArgs) --with-zlib-lib=../zlib/zlib.lib</ConfigArgs>
-      <ConfigArgs>$(ConfigArgs) --with-zlib-include=../zlib</ConfigArgs>
+      <ConfigArgs>$(ConfigArgs) no-shared no-krb5 no-hw enable-tlsext</ConfigArgs>
+      <ConfigArgsWithZLib>$(ConfigArgs) zlib --with-zlib-lib=../zlib/zlib.lib</ConfigArgsWithZLib>
+      <ConfigArgsWithZLib>$(ConfigArgsWithZLib) --with-zlib-include=../zlib</ConfigArgsWithZLib>
       <PrepScript Condition="'$(Platform)' == 'Win32'">ms\do_ms.bat</PrepScript>
       <PrepScript Condition="'$(Platform)' == 'x64'">ms\do_win64a.bat</PrepScript>
     </PropertyGroup>
     <Exec WorkingDirectory="../requirements/openssl"
           Command="..\perl\perl.exe Configure $(ConfigArgs)" />
+    <Exec WorkingDirectory ="../requirements/openssl"
+          Command="cmd.exe /c $(PrepScript)" />
+    <Exec
+      WorkingDirectory="../requirements/openssl"
+      Command='nmake.exe /nologo /S /F ms\nt.mak'
+      />
+      
+    <Exec WorkingDirectory="../requirements/openssl"
+          Command="..\perl\perl.exe Configure $(ConfigArgsWithZLib)" />
     <Exec WorkingDirectory ="../requirements/openssl"
           Command="cmd.exe /c $(PrepScript)" />
     <Exec
