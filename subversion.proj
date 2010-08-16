@@ -97,6 +97,13 @@
       <Url>http://www.apache-mirror.com/apr/apr-iconv-1.2.1.tar.bz2</Url>
       <Sha1>c4707c92472dace3d96dd9d5d161d078b9797608</Sha1>
     </Package>
+    <Package Include="$(BuildDir)/sqlite">
+      <Name>SQLite</Name>
+      <Version>3.6.23.1</Version>
+      <Type>download</Type>
+      <Url>http://www.sqlite.org/sqlite-amalgamation-3_6_23_1.zip</Url>
+      <Sha1>70ff4dbc76cfb32745206857062a9e5e85fa07ae</Sha1>
+    </Package>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\targets\Master.targets" />
-</Project>
+</Project> 
