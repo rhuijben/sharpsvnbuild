@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="DswToMSBuild" TaskFactory="CodeTaskFactory" 
+      AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <SlnFile ParameterType="System.String" Required="true" />
+      <EnsurePlatform ParameterType="System.String" />
+
+
+
+
+
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.v4.0.dll"/>
+      <Reference Include="$(MSBuildThisFileDirectory)\ICSharpCode.SharpZipLib.dll"/>
+      <Reference Include="System.Xml"/>
+      <Code Type="Class" Language="cs">
+<![CDATA[using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Xml;
+using System.Xml.XPath;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class DswToMSBuild : Microsoft.Build.Utilities.Task
+{
+    string _slnFile;
+    [Required]
+    public string SlnFile 
+    {
+        get { return _slnFile; }
+        set { _slnFile = Path.GetFullPath(value); }
+    }
+    
+    public string EnsurePlatform { get; set; }
+
+    const string Ns = "http://schemas.microsoft.com/developer/msbuild/2003";
+    public override bool Execute()
+    {
+        SortedList<string, List<string>> projects = new SortedList<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        using(StreamReader sr = File.OpenText(SlnFile))
+        using (Stream sw = File.Create(Path.ChangeExtension(SlnFile, ".msbuildproj")))
+        {
+            string line, currentProject = null;
+            int nCurls = 0;
+            while (null != (line = sr.ReadLine()))
+            {
+                line = line.Trim();
+
+                if (line.Length == 0 || line.StartsWith("#"))
+                    continue;
+
+                if (line.StartsWith("{") && line.Trim('{').Length == 0)
+                {
+                    nCurls += line.Length;
+                    continue;
+                }
+                if (line.StartsWith("}") && line.Trim('}').Length == 0)
+                {
+                    nCurls -= line.Length;
+                    continue;
+                }
+
+                if (line.StartsWith("Project: "))
+                {
+                    line = line.Substring(9).Trim();
+                    string name = TakeToken(ref line, '=');
+                    string file = TakeToken(ref line, ' ');
+
+                    projects.Add(name, new List<string> { file });
+                    currentProject = name;
+
+                    continue;
+                }
+
+                if (nCurls == 3 && line.StartsWith("Project_Dep_Name "))
+                {
+                    string dep = line.Substring(17);
+                    projects[currentProject].Add(dep);
+                }
+            }
+
+            using(XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings { Indent=true }))
+            {
+                xw.WriteStartElement("Project", Ns);
+                xw.WriteAttributeString("DefaultTargets", "Build");
+
+                xw.WriteStartElement("PropertyGroup");
+                AddDefaultValue(xw, "Configuration", "Release");
+                AddDefaultValue(xw, "Platform", "Win32");
+                xw.WriteEndElement();
+
+                xw.WriteStartElement("ItemGroup");
+                foreach (KeyValuePair<string, List<string>> p in projects)
+                {
+                    xw.WriteStartElement("AllProjects");
+                    xw.WriteAttributeString("Include", ResultName(p.Value[0]));
+                    xw.WriteElementString("OriginalProject", p.Value[0]);
+                    xw.WriteElementString("ProjectName", p.Key);
+                    xw.WriteEndElement();
+                }
+                xw.WriteEndElement();
+
+                foreach (KeyValuePair<string, List<string>> p in projects)
+                {
+                    foreach (string suffix in new string[] { "", ":Clean", ":Rebuild" })
+                    {
+                        xw.WriteStartElement("Target");
+                        xw.WriteAttributeString("Name", p.Key + suffix);
+                        xw.WriteAttributeString("DependsOnTargets", MakeTargets(p.Value, suffix));
+                        xw.WriteStartElement("MSBuild");
+                        xw.WriteAttributeString("Projects", ResultName(p.Value[0]));
+                        xw.WriteAttributeString("Targets", string.IsNullOrEmpty(suffix) ? "Build" : suffix.Substring(1));
+                        xw.WriteAttributeString("Properties", "Configuration=$(Configuration); Platform=$(Platform)");
+                        xw.WriteAttributeString("ToolsVersion", "$(ProjectToolsVersion)");
+                        xw.WriteAttributeString("UnloadProjectsOnCompletion", "$(UnloadProjectsOnCompletion)");
+                        xw.WriteAttributeString("UseResultsCache", "$(UseResultsCache)");
+                        xw.WriteEndElement();
+                        xw.WriteEndElement();
+                    }
+                }
+            }
+        }
+
+        string slnDir = Path.GetDirectoryName(SlnFile);
+        foreach (KeyValuePair<string, List<string>> p in projects)
+        {
+            string pf = ResultName(p.Value[0]);
+
+            if (string.Equals(Path.GetExtension(pf), ".vcxproj", StringComparison.OrdinalIgnoreCase))
+            {
+                string prjFile = Path.Combine(slnDir, pf);
+                XmlDocument xd = new XmlDocument();
+                xd.Load(prjFile);
+                XmlElement ig = xd.CreateElement("ItemGroup", Ns);
+                xd.DocumentElement.AppendChild(ig);
+
+                for (int i = 1; i < p.Value.Count; i++)
+                {
+                    XmlElement pr = xd.CreateElement("ProjectReference", Ns);
+                    ig.AppendChild(pr);
+
+                    string rf = p.Value[i];
+
+                    pr.SetAttribute("Include", new Uri(prjFile).MakeRelativeUri(new Uri(ResultName(Path.Combine(slnDir, projects[rf][0])))).ToString().Replace("/", "\\"));
+                }
+
+                using (XmlWriter xw = XmlWriter.Create(prjFile, new XmlWriterSettings { Indent = true }))
+                    xd.WriteTo(xw);
+            }
+        }
+        return true;
+    }
+
+    private static void AddDefaultValue(XmlWriter xw, string name, string defaultValue)
+    {
+        xw.WriteStartElement(name);
+        xw.WriteAttributeString("Condition", string.Format("'$({0})'==''", name));
+        xw.WriteString(defaultValue);
+        xw.WriteEndElement();
+    }
+
+    private static string MakeTargets(List<string> list, string suffix)
+    {
+        StringBuilder sb = new StringBuilder();
+        int n = 0;
+
+        foreach (string s in list)
+        {
+            if (n++ == 0)
+                continue;
+            else if (n > 2)
+                sb.Append(";");
+            sb.Append(s);
+            if (!string.IsNullOrEmpty(suffix))
+                sb.Append(suffix);
+        }
+
+        return sb.ToString();
+    }
+
+    private static string ResultName(string p)
+    {
+        if (p.StartsWith(".\\"))
+            p = p.Substring(2);
+
+        if (string.Equals(Path.GetExtension(p), ".dsp", StringComparison.OrdinalIgnoreCase))
+            p = Path.ChangeExtension(p, ".vcxproj");
+
+        return p;
+    }
+
+    private static string TakeToken(ref string line, char p)
+    {
+        string result;
+        if (line.StartsWith("\""))
+        {
+            int n = line.IndexOf('\"', 1);
+            result = line.Substring(1, n - 1);
+            line = line.Substring(n + 1);
+
+            if (line.Length > 0 && line[0] == p)
+                line = line.Substring(1);
+        }
+        else
+        {
+            int n = line.IndexOf(p);
+            if (n > 0)
+            {
+                result = line.Substring(0,n);
+                line = line.Substring(n+1);
+            }
+            else
+            {
+                result = line;
+                line = "";
+            }
+        }
+        return result;
+    }
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>
