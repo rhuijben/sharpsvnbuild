@@ -4,7 +4,8 @@
   <UsingTask TaskName="SetEnvVar" TaskFactory="CodeTaskFactory" 
       AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
     <ParameterGroup>
-      <Targets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Variable ParameterType="System.String" Required="true" />
+      <Value ParameterType="System.String" Required="true" />
     </ParameterGroup>
     <Task>
       <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
