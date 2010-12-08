@@ -48,10 +48,10 @@
     </Package>
     <Package Include="$(BuildDir)/openssl">
       <Name>OpenSSL</Name>
-      <Version>1.0.0b</Version>
+      <Version>1.0.0c</Version>
       <Type>download</Type>
-      <Url>http://www.openssl.org/source/openssl-1.0.0a.tar.gz</Url>
-      <Sha1>b837a9f75a51f456bd533690cf04d3d5714812dc</Sha1>
+      <Url>http://www.openssl.org/source/openssl-1.0.0c.tar.gz</Url>
+      <Sha1>5a2d74fa7fe90c80915332404b9700044ef676a1</Sha1>
     </Package>
     <Package Include="$(BuildDir)/neon">
       <Name>Neon</Name>
