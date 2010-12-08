@@ -30,7 +30,7 @@
 
     <MSBuild
         Projects="..\requirements\httpd\apache.msbuildproj" 
-        Targets="httpd"
+        Targets="httpd;htpasswd;mod_dav;mod_auth_basic;mod_authn_file;mod_mime;mod_alias;mod_log_config"
      />
   </Target>
 </Project>
