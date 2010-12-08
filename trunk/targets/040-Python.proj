@@ -14,8 +14,11 @@
     <PyProj Include="..\requirements\python\pcbuild\python.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\pythonw.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\winsound.vcxproj" />
-    <PyProj Include="..\requirements\python\pcbuild\_socket.vcxproj" />    
-    <PyProj Include="..\requirements\python\pcbuild\_ssl.vcxproj" />    
+    <PyProj Include="..\requirements\python\pcbuild\_ctypes.vcxproj" />
+    <PyProj Include="..\requirements\python\pcbuild\_elementtree.vcxproj" />
+    <PyProj Include="..\requirements\python\pcbuild\_socket.vcxproj" />
+    <!--PyProj Include="..\requirements\python\pcbuild\_sqlite3.vcxproj" /-->
+    <PyProj Include="..\requirements\python\pcbuild\_ssl.vcxproj" />
   </ItemGroup>
 
   <Target Name="Build" DependsOnTargets="">
