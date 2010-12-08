@@ -16,7 +16,7 @@
     />
   </Target>
   <ItemGroup>
-    <ProjectFile Include="$(MSBuildProjectDirectory)/targets/*-Python.*proj" />
+    <ProjectFile Include="$(MSBuildProjectDirectory)/targets/*-*.proj" />
   </ItemGroup>
    <Target Name="Build" DependsOnTargets="Download">
      <MSBuild
