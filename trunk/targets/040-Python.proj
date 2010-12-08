@@ -4,7 +4,6 @@
     <OldProjects Include="..\requirements\python\pcbuild\*.vcproj" />
   </ItemGroup>
   <Import Project="../tasks/FixEols.targets"/>
-  <Import Project="../tasks/Replace.targets"/>
 
   <ItemGroup>
     <PyProj Include="..\requirements\python\pcbuild\make_versioninfo.vcxproj" />
