@@ -14,6 +14,7 @@
     <PyProj Include="..\requirements\python\pcbuild\python.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\pythonw.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\winsound.vcxproj" />
+    <PyProj Include="..\requirements\python\pcbuild\_socket.vcxproj" />    
     <PyProj Include="..\requirements\python\pcbuild\_ssl.vcxproj" />    
   </ItemGroup>
 
