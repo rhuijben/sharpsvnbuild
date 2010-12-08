@@ -34,10 +34,10 @@
     </Package>
     <Package Include="$(BuildDir)/perl">
       <Name>Perl</Name>
-      <Version>5.12.1</Version>
+      <Version>5.12.2</Version>
       <Type>download</Type>
-      <Url>http://www.cpan.org/src/5.0/perl-5.12.1.tar.gz</Url>
-      <Sha1>83b99f08379782dc06594a85eeb279edc5b0ca44</Sha1>
+      <Url>http://www.cpan.org/src/5.0/perl-5.12.2.tar.gz</Url>
+      <Sha1>c157f214a93ce20fc06dc9d9c902c05ad1327cb1</Sha1>
     </Package>
     <Package Include="$(BuildDir)/zlib">
       <Name>ZLib</Name>
@@ -62,7 +62,7 @@
     </Package>
     <Package Include="$(BuildDir)/serf">
       <Name>Serf</Name>
-      <Version>0.29.3</Version>
+      <Version>0.6.1</Version>
       <Type>download</Type>
       <Url>http://serf.googlecode.com/files/serf-0.6.1.tar.bz2</Url>
       <Sha1>9c6c77cc3f76495fbbc83302979c3becb4d2671a</Sha1>
