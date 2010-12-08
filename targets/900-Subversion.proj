@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetName>svn</TargetName>
+    <OutputPath>subversion</OutputPath>
+  </PropertyGroup>
+
+  <Target Name="GenMake">
+    <PropertyGroup>
+      <GenArgs>gen-make.py -t vcproj --vsnet-version=2010</GenArgs>
+      <GenArgs>$(GenArgs) --release</GenArgs>
+      
+      <GenArgs>$(GenArgs) "--with-apr=../requirements/httpd/srclib/apr"</GenArgs>
+      <GenArgs>$(GenArgs) "--with-apr-util=../requirements/httpd/srclib/apr-util"</GenArgs>
+      <GenArgs>$(GenArgs) "--with-httpd=../requirements/httpd"</GenArgs>
+      
+      <GenArgs>$(GenArgs) "--with-openssl=../requirements/openssl"</GenArgs>
+      <GenArgs>$(GenArgs) "--with-sqlite=../requirements/sqlite"</GenArgs>
+      <GenArgs>$(GenArgs) "--with-zlib=../requirements/zlib" --enable-ml</GenArgs>
+      
+      <GenArgs>$(GenArgs) "--with-neon=../requirements/neon"</GenArgs>
+      <GenArgs>$(GenArgs) "--with-serf=../requirements/serf</GenArgs>     
+    </PropertyGroup>
+    
+    <Exec WorkingDirectory="../subversion"
+          Command='..\requirements\python\pcbuild\python.exe $(GenArgs)' />
+  </Target>
+  
+  <Target Name="Build" DependsOnTargets="GenMake">
+    
+    <MSBuild Projects="..\subversion\subversion_vcnet.sln" />
+  </Target>
+</Project>
