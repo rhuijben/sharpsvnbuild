@@ -137,10 +137,10 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                         xw.WriteStartElement("MSBuild");
                         xw.WriteAttributeString("Projects", ResultName(p.Value[0]));
                         xw.WriteAttributeString("Targets", string.IsNullOrEmpty(suffix) ? "Build" : suffix.Substring(1));
-                        xw.WriteAttributeString("Properties", "Configuration=$(Configuration); Platform=$(Platform)");
-                        xw.WriteAttributeString("ToolsVersion", "$(ProjectToolsVersion)");
-                        xw.WriteAttributeString("UnloadProjectsOnCompletion", "$(UnloadProjectsOnCompletion)");
-                        xw.WriteAttributeString("UseResultsCache", "$(UseResultsCache)");
+                        xw.WriteAttributeString("Properties", "Configuration=$" + "(Configuration); Platform=$"+"(Platform)");
+                        xw.WriteAttributeString("ToolsVersion", "$" + "(ProjectToolsVersion)");
+                        xw.WriteAttributeString("UnloadProjectsOnCompletion", "$" + "(UnloadProjectsOnCompletion)");
+                        xw.WriteAttributeString("UseResultsCache", "$" + "(UseResultsCache)");
                         xw.WriteEndElement();
                         xw.WriteEndElement();
                     }
@@ -152,19 +152,29 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
         foreach (KeyValuePair<string, List<string>> p in projects)
         {
             string pf = ResultName(p.Value[0]);
+            string prjFile = Path.Combine(slnDir, pf);
 
-            if (string.Equals(Path.GetExtension(pf), ".vcxproj", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(Path.GetExtension(pf), ".vcxproj", StringComparison.OrdinalIgnoreCase)
+                 && File.Exists(prjFile))
             {
-                string prjFile = Path.Combine(slnDir, pf);
                 XmlDocument xd = new XmlDocument();
                 xd.Load(prjFile);
+                XmlNamespaceManager NsMgr = new XmlNamespaceManager(xd.NameTable);
+                NsMgr.AddNamespace("q", Ns);
                 XmlElement ig = xd.CreateElement("ItemGroup", Ns);
-                xd.DocumentElement.AppendChild(ig);
+                
+                XmlNode lastImport = xd.DocumentElement.SelectSingleNode("q:Import[last()]", NsMgr);
+                
+                xd.DocumentElement.InsertBefore(ig, lastImport);
 
                 for (int i = 1; i < p.Value.Count; i++)
                 {
                     XmlElement pr = xd.CreateElement("ProjectReference", Ns);
                     ig.AppendChild(pr);
+                    
+                    XmlElement poa = xd.CreateElement("ReferenceOutputAssembly", Ns);
+                    poa.AppendChild(xd.CreateTextNode("false"));
+                    pr.AppendChild(poa);
 
                     string rf = p.Value[i];
 
