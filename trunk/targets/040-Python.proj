@@ -32,7 +32,8 @@
     <MSBuild Projects="@(PyProj)"
              Properties="sqlite3Dir=..\..\sqlite;
                          opensslDir=..\..\openssl;
-                         PreBuildEventUseInBuild=false"
+                         PreBuildEventUseInBuild=false;
+                         Platform=$(Platform)"
     />
   </Target>
 </Project>
