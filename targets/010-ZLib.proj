@@ -9,11 +9,11 @@
   <Target Name="Build" DependsOnTargets="">
     <PropertyGroup>
       <PlatformProps Condition="'$(Platform)' == 'Win32'">LOC="-DASMV -DASMINF" OBJA="inffas32.obj match686.obj"</PlatformProps>
-      <PlatformProps Condition="'$(Platform)' == 'x64'">AS=ml64 LOC="-DASMV -DASMINF -I${zlibDir}" OBJA="inffasx64.obj gvmat64.obj inffas8664.obj"</PlatformProps>
+      <PlatformProps Condition="'$(Platform)' == 'x64'">AS=ml64 LOC="-DASMV -DASMINF -I$([System.IO.Path]::GetFullPath('../requirements/zlib'))" OBJA="inffasx64.obj gvmat64.obj inffas8664.obj"</PlatformProps>
     </PropertyGroup>
     <Exec
       WorkingDirectory="../requirements/zlib"
-      Command='nmake.exe /nologo /S /F win32/Makefile.msc $(PlatformProps)'
+      Command="nmake.exe /nologo /S /F win32/Makefile.msc $(PlatformProps)"
       />
   </Target>
 </Project>
