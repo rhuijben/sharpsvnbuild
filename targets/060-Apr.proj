@@ -6,7 +6,8 @@
   </PropertyGroup>
   <Import Project="../tasks/FixEols.targets"/>
   <Import Project="../tasks/Replace.targets"/>
-
+  <Import Project="../tasks/DswToMSBuild.targets"/>
+  
   <ItemGroup>
     <OldProjects Include="..\requirements\httpd\**\*.dsp" />
   </ItemGroup>
@@ -28,10 +29,21 @@
           Command="..\perl\perl.exe srclib\apr\build\cvtdsp.pl -2005 -mt" />
     <!-- The projects in httpd and apr all have \n instead of \r\n -->
     <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
-    
+
     <Exec WorkingDirectory="../requirements/httpd" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
           Command="vcupgrade.exe /nologo /nocolor %(OldProjects.fullpath)" />
 
-    <MSBuild Projects="@(AprProj)" />
+    <DswToMSBuild
+        SlnFile="../requirements/httpd/srclib/apr/apr.dsw"
+        EnsurePlatform="$(Platform)"
+     />
+    <DswToMSBuild
+        SlnFile="../requirements/httpd/srclib/apr-util/aprutil.dsw"
+        EnsurePlatform="$(Platform)"
+     />
+
+    <MSBuild Projects="@(AprProj)" 
+             Properties="Platform=$(Platform)"
+             />
   </Target>
 </Project>
