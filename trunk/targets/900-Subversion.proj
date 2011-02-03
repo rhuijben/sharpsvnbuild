@@ -33,6 +33,6 @@
   
   <Target Name="Build" DependsOnTargets="GenMake">
     
-    <MSBuild Projects="..\subversion\subversion_vcnet.sln" />
+    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="__ALL_TESTS__"/>
   </Target>
 </Project>
