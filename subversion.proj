@@ -27,17 +27,17 @@
   <ItemGroup>
     <Package Include="$(BuildDir)/python">
        <Name>Python</Name>
-       <Version>2.6.5</Version>
+       <Version>2.7.1</Version>
        <Type>download</Type>
-       <Url>http://www.python.org/ftp/python/2.6.5/Python-2.6.5.tar.bz2</Url>
-       <Sha1>24c94f5428a8c94c9d0b316e3019fee721fdb5d1</Sha1>
+       <Url>http://www.python.org/ftp/python/2.7.1/Python-2.7.1.tar.bz2</Url>
+       <Sha1>fbe1894322ff91b80726e269c97454f4129fc2a3</Sha1>
     </Package>
     <Package Include="$(BuildDir)/perl">
       <Name>Perl</Name>
-      <Version>5.12.2</Version>
+      <Version>5.12.3</Version>
       <Type>download</Type>
-      <Url>http://www.cpan.org/src/5.0/perl-5.12.2.tar.gz</Url>
-      <Sha1>c157f214a93ce20fc06dc9d9c902c05ad1327cb1</Sha1>
+      <Url>http://www.cpan.org/src/5.0/perl-5.12.3.tar.gz</Url>
+      <Sha1>ecf51cc7c91ef000671659934a719c8bd6a70138</Sha1>
     </Package>
     <Package Include="$(BuildDir)/zlib">
       <Name>ZLib</Name>
