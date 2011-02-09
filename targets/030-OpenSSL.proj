@@ -14,6 +14,7 @@
       <ConfigArgs>$(ConfigArgs) no-shared no-krb5 no-hw enable-tlsext</ConfigArgs>
       <ConfigArgsWithZLib>$(ConfigArgs) zlib --with-zlib-lib=../zlib/zlib.lib</ConfigArgsWithZLib>
       <ConfigArgsWithZLib>$(ConfigArgsWithZLib) --with-zlib-include=../zlib</ConfigArgsWithZLib>
+      <ConfigArgsWithZLib>$(ConfigArgsWithZLib) enable-capieng -DOPENSSL_SSL_CLIENT_ENGINE_AUTO=capi -DOPENSSL_CAPIENG_DIALOG</ConfigArgsWithZLib>
       <PrepScript Condition="'$(Platform)' == 'Win32'">ms\do_ms.bat</PrepScript>
       <PrepScript Condition="'$(Platform)' == 'x64'">ms\do_win64a.bat</PrepScript>
     </PropertyGroup>

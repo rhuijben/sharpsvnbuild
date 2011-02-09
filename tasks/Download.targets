@@ -158,6 +158,16 @@ public class Download : Microsoft.Build.Utilities.Task
       return DoRemove();
     }
     
+    string TransformZipName(string pkgRoot, string name)
+    {
+      if (pkgRoot == "*/")
+          return name.Substring(name.IndexOf('/')+1);
+      else if (name.StartsWith(pkgRoot, StringComparison.OrdinalIgnoreCase))
+          return name.Substring(pkgRoot.Length);
+          
+      return name;
+    }
+    
     bool ExtractTar(Stream inStream)
     {
       using(inStream)
@@ -171,8 +181,7 @@ public class Download : Microsoft.Build.Utilities.Task
         
         archive.ProgressMessageEvent += delegate(TarArchive sender, TarEntry entry, string msg)
            {
-             if (entry.Name.StartsWith(pkgRoot, StringComparison.OrdinalIgnoreCase))
-               entry.Name = entry.Name.Substring(pkgRoot.Length);
+             entry.Name = TransformZipName(pkgRoot, entry.Name);
            };
         
         archive.ExtractContents(expandTo);
@@ -280,6 +289,25 @@ public class Download : Microsoft.Build.Utilities.Task
             
          return sb.ToString();
       }
+    }
+    
+    delegate string TransformName(string from, bool forFile);
+    sealed class NameTransformer : ICSharpCode.SharpZipLib.Core.INameTransform
+    {
+       readonly TransformName _tn;
+       public NameTransformer(TransformName tn)
+       {
+         _tn = tn;
+       }
+    
+       public string TransformDirectory(string name)
+       {
+         return _tn(name, false);
+       }
+       public string TransformFile(string name)
+       {
+         return _tn(name, true);
+       }
     }
 }
 ]]></Code>
