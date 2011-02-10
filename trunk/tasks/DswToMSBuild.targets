@@ -191,7 +191,7 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
     private static void AddDefaultValue(XmlWriter xw, string name, string defaultValue)
     {
         xw.WriteStartElement(name);
-        xw.WriteAttributeString("Condition", string.Format("'$({0})'==''", name));
+        xw.WriteAttributeString("Condition", string.Format("'$" +"({0})'==''", name));
         xw.WriteString(defaultValue);
         xw.WriteEndElement();
     }
