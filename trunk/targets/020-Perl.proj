@@ -7,15 +7,19 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 
-  <Target Name="Build" DependsOnTargets="">
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <PropertyGroup>
       <CommonProps>INST_DRV=C: CCTYPE=MSVC90</CommonProps>
       <PlatformProps Condition="'$(Platform)' == 'Win32'">WIN64=undef ProcessorArchitecture=X86 ARCHITECTURE=x86</PlatformProps>
       <PlatformProps Condition="'$(Platform)' == 'x64'">WIN64</PlatformProps>
     </PropertyGroup>
     <Exec
-      WorkingDirectory="../requirements/perl/win32"
-      Command='nmake.exe /nologo /S /F Makefile $(CommonProps) $(PlatformProps)'
+        WorkingDirectory="../requirements/perl/win32"
+        Command='nmake.exe /nologo /S /F Makefile $(CommonProps) $(PlatformProps)'
+      />
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
       />
   </Target>
 </Project>

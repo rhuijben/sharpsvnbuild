@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 
-  <Target Name="Build" DependsOnTargets="">
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <PropertyGroup>
       <ConfigArgs Condition="'$(Platform)' == 'Win32'">VC-WIN32</ConfigArgs>
       <ConfigArgs Condition="'$(Platform)' == 'x64'">VC-WIN64A</ConfigArgs>
@@ -34,6 +34,10 @@
     <Exec
       WorkingDirectory="../requirements/openssl"
       Command='nmake.exe /nologo /S /F ms\ntdll.mak'
+      />
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
       />
   </Target>
 </Project>

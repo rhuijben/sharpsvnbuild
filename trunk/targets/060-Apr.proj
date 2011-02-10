@@ -24,7 +24,7 @@
     <AprProj Include="..\requirements\httpd\srclib\apr-util\aprutil.vcxproj" />
   </ItemGroup>
 
-  <Target Name="Build" DependsOnTargets="">
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <Exec WorkingDirectory="../requirements/httpd"
           Command="..\perl\perl.exe srclib\apr\build\cvtdsp.pl -2005 -mt" />
     <!-- The projects in httpd and apr all have \n instead of \r\n -->
@@ -45,5 +45,9 @@
     <MSBuild Projects="@(AprProj)" 
              Properties="Platform=$(Platform)"
              />
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
+      />
   </Target>
 </Project>
