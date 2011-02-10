@@ -5,10 +5,12 @@
   </ItemGroup>
   <Import Project="../tasks/FixEols.targets"/>
   <Import Project="../tasks/DswToMSBuild.targets"/>
-  
+
   <ItemGroup>
-    <PyProj Include="..\requirements\python\pcbuild\make_versioninfo.vcxproj" />
-    <PyProj Include="..\requirements\python\pcbuild\make_buildinfo.vcxproj" />
+    <PyProj32 Include="..\requirements\python\pcbuild\make_versioninfo.vcxproj" />
+    <PyProj32 Include="..\requirements\python\pcbuild\make_buildinfo.vcxproj" />
+  </ItemGroup>  
+  <ItemGroup>
     <PyProj Include="..\requirements\python\pcbuild\pythoncore.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\w9xpopen.vcxproj" />
     <PyProj Include="..\requirements\python\pcbuild\sqlite3.vcxproj" />
@@ -34,6 +36,13 @@
         SlnFile="../requirements/python/PC/VC6/pcbuild.dsw"
         EnsurePlatform="$(Platform)"
      />
+     
+    <MSBuild Projects="@(PyProj32)"
+             Properties="sqlite3Dir=..\..\sqlite;
+                         opensslDir=..\..\openssl;
+                         PreBuildEventUseInBuild=false;
+                         Platform=Win32"
+      />
           
     <MSBuild Projects="@(PyProj)"
              Properties="sqlite3Dir=..\..\sqlite;
