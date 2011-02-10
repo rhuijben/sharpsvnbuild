@@ -50,4 +50,6 @@
         AlwaysCreate="true"
       />
   </Target>
+  <Target Name="clean">
+  </Target>
 </Project>

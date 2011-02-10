@@ -22,4 +22,10 @@
         AlwaysCreate="true"
       />
   </Target>
+  <Target Name="clean">
+    <Exec
+        WorkingDirectory="../requirements/perl/win32"
+        Command='nmake.exe /nologo /S /F Makefile clean'
+      />
+  </Target>
 </Project>
