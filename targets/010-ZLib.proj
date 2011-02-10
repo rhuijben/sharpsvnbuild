@@ -20,4 +20,10 @@
         AlwaysCreate="true"
       />
   </Target>
+  <Target Name="clean">
+    <Exec
+        WorkingDirectory="../requirements/zlib"
+        Command="nmake.exe /nologo /S /F win32/Makefile.msc clean"
+      />
+  </Target>
 </Project>

@@ -35,4 +35,7 @@
     
     <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="__ALL_TESTS__"/>
   </Target>
+  <Target Name="Clean" DependsOnTargets="GenMake">
+    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="clean"/>
+  </Target>
 </Project>
