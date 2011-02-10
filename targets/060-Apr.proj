@@ -5,7 +5,6 @@
     <OutputPath>requirements/httpd</OutputPath>
   </PropertyGroup>
   <Import Project="../tasks/FixEols.targets"/>
-  <Import Project="../tasks/Replace.targets"/>
   <Import Project="../tasks/DswToMSBuild.targets"/>
   
   <ItemGroup>
