@@ -9,7 +9,7 @@
   <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <PropertyGroup>
       <ConfigArgs Condition="'$(Platform)' == 'Win32'">VC-WIN32</ConfigArgs>
-      <ConfigArgs Condition="'$(Platform)' == 'x64'">VC-WIN64A</ConfigArgs>
+      <ConfigArgs Condition="'$(Platform)' == 'x64'">VC-WIN64A no-asm</ConfigArgs>
       <ConfigArgs>$(ConfigArgs) -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_DEPRECATE</ConfigArgs>
       <ConfigArgs>$(ConfigArgs) no-shared no-krb5 no-hw enable-tlsext</ConfigArgs>
       <ConfigArgsWithZLib>$(ConfigArgs) zlib --with-zlib-lib=../zlib/zlib.lib</ConfigArgsWithZLib>
