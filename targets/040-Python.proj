@@ -22,7 +22,7 @@
     <PyProj Include="..\requirements\python\pcbuild\_ssl.vcxproj" />
   </ItemGroup>
 
-  <Target Name="Build" DependsOnTargets="">
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <!--FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/-->
     
     <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
@@ -40,6 +40,10 @@
                          opensslDir=..\..\openssl;
                          PreBuildEventUseInBuild=false;
                          Platform=$(Platform)"
-    />
+      />
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
+      />
   </Target>
 </Project>

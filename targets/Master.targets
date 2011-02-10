@@ -18,11 +18,22 @@
   <ItemGroup>
     <ProjectFile Include="$(MSBuildProjectDirectory)/targets/*-*.proj" />
   </ItemGroup>
-   <Target Name="Build" DependsOnTargets="Download">
-     <MSBuild
-       Projects="@(ProjectFile)"
-       
-       Properties="Configuration=$(Configuration);Platform=$(Platform)"
-       />
+  <Target Name="Build" DependsOnTargets="Download">
+    <MSBuild
+        Projects="@(ProjectFile)"
+        Properties="Configuration=$(Configuration);Platform=$(Platform)"
+      />
+  </Target>
+  <Target Name="Clean">
+    <ItemGroup>
+      <DoneFile Include="requirements/*.done" />
+    </ItemGroup>
+    <Delete Files="@(DoneFile)" />
+    <MSBuild
+        Projects="@(ProjectFile)"
+        Properties="Configuration=$(Configuration);Platform=$(Platform)"
+        Targets="clean"
+      />
+     
   </Target>
 </Project>
