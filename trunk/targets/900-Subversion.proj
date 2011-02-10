@@ -27,8 +27,9 @@
       <GenArgs>$(GenArgs) "--with-serf=../requirements/serf</GenArgs>     
     </PropertyGroup>
     
-    <Exec WorkingDirectory="../subversion"
-          Command='..\requirements\python\pcbuild\python.exe $(GenArgs)' />
+    <Exec
+        WorkingDirectory="../subversion"
+        Command='python.exe $(GenArgs)' />
   </Target>
   
   <Target Name="Build" DependsOnTargets="GenMake">

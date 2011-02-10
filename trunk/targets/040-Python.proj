@@ -57,6 +57,28 @@ s|\\inc64|\inc32|"
                          PreBuildEventUseInBuild=false;
                          Platform=$(Platform)"
       />
+      
+    <PropertyGroup>
+      <PyResultDir Condition="'$(Platform)'=='Win32'">../requirements/python/PCBuild</PyResultDir>
+      <PyResultDir Condition="'$(Platform)'=='x64'">../requirements/python/PCBuild/amd64</PyResultDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <ResultFiles Include="$(PyResultDir)/*.exe" />
+      <ResultFiles Include="$(PyResultDir)/*.dll" />
+      <ResultFiles Include="$(PyResultDir)/*.pyd" />
+      <ResultLibFiles Include="../requirements/python/Lib/**/*.*" />
+    </ItemGroup>
+    <Copy
+        SourceFiles="@(ResultFiles)"
+        DestinationFolder="../requirements/bin"
+        OverwriteReadOnlyFiles="true"
+      />
+    <Copy
+        SourceFiles="@(ResultLibFiles)"
+        DestinationFiles="@(ResultLibFiles->'../requirements/bin/Lib/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
+
     <Touch
         Files="../requirements/$(MSBuildProjectName).done"
         AlwaysCreate="true"
