@@ -24,7 +24,7 @@
       <GenArgs>$(GenArgs) "--with-zlib=../requirements/zlib" --enable-ml</GenArgs>
       
       <GenArgs>$(GenArgs) "--with-neon=../requirements/neon"</GenArgs>
-      <GenArgs>$(GenArgs) "--with-serf=../requirements/serf</GenArgs>     
+      <GenArgs>$(GenArgs) "--with-serf=../requirements/serf"</GenArgs>     
     </PropertyGroup>
     
     <Exec
