@@ -6,13 +6,21 @@
     <PlatformTarget>$(Platform)</PlatformTarget>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="../tasks/Replace.targets" />
 
   <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <PropertyGroup>
       <CommonProps>INST_DRV=C: CCTYPE=MSVC90</CommonProps>
       <PlatformProps Condition="'$(Platform)' == 'Win32'">WIN64=undef ProcessorArchitecture=X86 ARCHITECTURE=x86</PlatformProps>
-      <PlatformProps Condition="'$(Platform)' == 'x64'">WIN64</PlatformProps>
+      <PlatformProps Condition="'$(Platform)' == 'x64'"></PlatformProps>
     </PropertyGroup>
+    
+    <!-- Work around an obscure x64 miniperl issue which is not ported back to the current perl version -->
+    <Replace
+        Targets="../requirements/perl/win32/Makefile"
+        Commands="
+s|\%24\(MINIPERL\) -I..\\lib bin\\exetype.pl|%24(PERLEXE) -I..\lib bin\exetype.pl"
+      />
     <Exec
         WorkingDirectory="../requirements/perl/win32"
         Command='nmake.exe /nologo /S /F Makefile $(CommonProps) $(PlatformProps)'
