@@ -127,8 +127,70 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                 }
                 xw.WriteEndElement();
 
+                string slnDir = Path.GetDirectoryName(SlnFile);
                 foreach (KeyValuePair<string, List<string>> p in projects)
                 {
+                    string pf = ResultName(p.Value[0]);
+                    string prjFile = Path.Combine(slnDir, pf);
+                    string config = "$" + "(Configuration)";
+                    string platform = "$" + "(Platform)";
+
+                    if (string.Equals(Path.GetExtension(pf), ".vcxproj", StringComparison.OrdinalIgnoreCase)
+                         && File.Exists(prjFile))
+                    {
+                        XmlDocument xd = new XmlDocument();
+                        xd.Load(prjFile);
+                        XmlNamespaceManager NsMgr = new XmlNamespaceManager(xd.NameTable);
+                        NsMgr.AddNamespace("q", Ns);
+                        XmlElement ig = xd.CreateElement("ItemGroup", Ns);
+                        
+                        
+                        XmlNodeList configs = xd.DocumentElement.SelectNodes("//q:ProjectConfiguration/@Include", NsMgr);
+                        List<string> projConfigs = new List<string>();
+                        List<string> projPlatforms = new List<string>();
+                        Console.WriteLine("{0}: {1}", pf, configs.Count);
+                        foreach(XmlAttribute a in configs)
+                        {
+                            string[] parts = a.Value.Split('|');
+                            
+                            if (!projConfigs.Contains(parts[0]))
+                                projConfigs.Add(parts[0]);
+                            if (!projPlatforms.Contains(parts[1]))
+                                projPlatforms.Add(parts[1]);
+                        }
+                        
+                        if (projConfigs.Count == 1)
+                            config = projConfigs[0];
+                        if (projPlatforms.Count == 1)
+                            platform = projPlatforms[0];
+                        
+                        XmlNode lastImport = xd.DocumentElement.SelectSingleNode("q:Import[last()]", NsMgr);
+                        
+                        xd.DocumentElement.InsertBefore(ig, lastImport);
+
+                        for (int i = 1; i < p.Value.Count; i++)
+                        {
+                            XmlElement pr = xd.CreateElement("ProjectReference", Ns);
+                            ig.AppendChild(pr);
+                            
+                            XmlElement poa = xd.CreateElement("ReferenceOutputAssembly", Ns);
+                            poa.AppendChild(xd.CreateTextNode("false"));
+                            pr.AppendChild(poa);
+
+                            string rf = p.Value[i];
+
+                            pr.SetAttribute("Include", new Uri(prjFile).MakeRelativeUri(new Uri(ResultName(Path.Combine(slnDir, projects[rf][0])))).ToString().Replace("/", "\\"));
+                        }
+                        
+                        if (!File.Exists(prjFile + ".tickRefs"))
+                        {
+                            using (XmlWriter xpw = XmlWriter.Create(prjFile, new XmlWriterSettings { Indent = true }))
+                              xd.WriteTo(xpw);
+                              
+                            File.WriteAllText(prjFile + ".tickRefs", "");
+                        }
+                    }
+                    
                     foreach (string suffix in new string[] { "", ":Clean", ":Rebuild" })
                     {
                         xw.WriteStartElement("Target");
@@ -136,8 +198,9 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                         xw.WriteAttributeString("DependsOnTargets", MakeTargets(p.Value, suffix));
                         xw.WriteStartElement("MSBuild");
                         xw.WriteAttributeString("Projects", ResultName(p.Value[0]));
+                        
                         xw.WriteAttributeString("Targets", string.IsNullOrEmpty(suffix) ? "Build" : suffix.Substring(1));
-                        xw.WriteAttributeString("Properties", "Configuration=$" + "(Configuration); Platform=$"+"(Platform)");
+                        xw.WriteAttributeString("Properties", "Configuration=" + config + "; Platform=" + platform);
                         xw.WriteAttributeString("ToolsVersion", "$" + "(ProjectToolsVersion)");
                         xw.WriteAttributeString("UnloadProjectsOnCompletion", "$" + "(UnloadProjectsOnCompletion)");
                         xw.WriteAttributeString("UseResultsCache", "$" + "(UseResultsCache)");
@@ -148,43 +211,6 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
             }
         }
 
-        string slnDir = Path.GetDirectoryName(SlnFile);
-        foreach (KeyValuePair<string, List<string>> p in projects)
-        {
-            string pf = ResultName(p.Value[0]);
-            string prjFile = Path.Combine(slnDir, pf);
-
-            if (string.Equals(Path.GetExtension(pf), ".vcxproj", StringComparison.OrdinalIgnoreCase)
-                 && File.Exists(prjFile))
-            {
-                XmlDocument xd = new XmlDocument();
-                xd.Load(prjFile);
-                XmlNamespaceManager NsMgr = new XmlNamespaceManager(xd.NameTable);
-                NsMgr.AddNamespace("q", Ns);
-                XmlElement ig = xd.CreateElement("ItemGroup", Ns);
-                
-                XmlNode lastImport = xd.DocumentElement.SelectSingleNode("q:Import[last()]", NsMgr);
-                
-                xd.DocumentElement.InsertBefore(ig, lastImport);
-
-                for (int i = 1; i < p.Value.Count; i++)
-                {
-                    XmlElement pr = xd.CreateElement("ProjectReference", Ns);
-                    ig.AppendChild(pr);
-                    
-                    XmlElement poa = xd.CreateElement("ReferenceOutputAssembly", Ns);
-                    poa.AppendChild(xd.CreateTextNode("false"));
-                    pr.AppendChild(poa);
-
-                    string rf = p.Value[i];
-
-                    pr.SetAttribute("Include", new Uri(prjFile).MakeRelativeUri(new Uri(ResultName(Path.Combine(slnDir, projects[rf][0])))).ToString().Replace("/", "\\"));
-                }
-
-                using (XmlWriter xw = XmlWriter.Create(prjFile, new XmlWriterSettings { Indent = true }))
-                    xd.WriteTo(xw);
-            }
-        }
         return true;
     }
 
