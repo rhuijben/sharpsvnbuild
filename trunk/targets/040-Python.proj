@@ -5,6 +5,7 @@
   </ItemGroup>
   <Import Project="../tasks/FixEols.targets"/>
   <Import Project="../tasks/DswToMSBuild.targets"/>
+  <Import Project="../tasks/Replace.targets"/>
 
   <ItemGroup>
     <PyProj32 Include="..\requirements\python\pcbuild\make_versioninfo.vcxproj" />
@@ -28,6 +29,12 @@
     <!--FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/-->
     
     <FixEols Targets="@(OldProjects)" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"/>
+    
+    <!-- Somehow python expects XXX64 directories in openssl, while building openssl in 64 bit creates XXX32 -->
+    <Replace Targets="@(OldProjects)" Commands="
+s|\\out64|\out32|
+s|\\inc64|\inc32|"
+      />
     
     <Exec WorkingDirectory="../requirements/python" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
           Command="vcupgrade.exe /nologo %(OldProjects.fullpath)" />
