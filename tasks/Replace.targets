@@ -74,9 +74,9 @@ public class Replace : Microsoft.Build.Utilities.Task
          
          if (string.IsNullOrEmpty(cmd))
            continue;
-         if(cmd.StartsWith("s") && line.Length > 3)
+         if(cmd.StartsWith("s") && cmd.Length > 3)
          {
-             string[] blocks = cmd.Split(line[1]);
+             string[] blocks = cmd.Split(cmd[1]);
 
              text = Regex.Replace(text, blocks[1], blocks[2]);
          }
