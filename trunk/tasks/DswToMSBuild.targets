@@ -148,7 +148,7 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                         XmlNodeList configs = xd.DocumentElement.SelectNodes("//q:ProjectConfiguration/@Include", NsMgr);
                         List<string> projConfigs = new List<string>();
                         List<string> projPlatforms = new List<string>();
-                        Console.WriteLine("{0}: {1}", pf, configs.Count);
+
                         foreach(XmlAttribute a in configs)
                         {
                             string[] parts = a.Value.Split('|');
@@ -163,6 +163,15 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                             config = projConfigs[0];
                         if (projPlatforms.Count == 1)
                             platform = projPlatforms[0];
+                            
+                        if (!string.IsNullOrEmpty(EnsurePlatform)
+                            && !projPlatforms.Contains(EnsurePlatform)
+                            && projPlatforms.Contains("Win32"))
+                        {
+                           AddPlatform(xd, EnsurePlatform, projConfigs, NsMgr);
+                           platform = "$" + "(Platform)";
+                           projPlatforms.Add(EnsurePlatform);
+                        }
                         
                         XmlNode lastImport = xd.DocumentElement.SelectSingleNode("q:Import[last()]", NsMgr);
                         
@@ -279,6 +288,42 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
             }
         }
         return result;
+    }
+    
+    private static void AddPlatform(XmlDocument xd, string platform, IEnumerable<string> projConfigs, XmlNamespaceManager NsMgr)
+    {   
+        XmlElement el; 
+        XmlElement pConfigs = (XmlElement)xd.DocumentElement.SelectSingleNode("//q:ItemGroup[@Label='ProjectConfigurations']", NsMgr);
+
+        foreach(string config in projConfigs)
+        {
+          el = xd.CreateElement("ProjectConfiguration", Ns);
+          el.SetAttribute("Include", config + "|" + platform);
+          
+          XmlElement p = xd.CreateElement("Configuration", Ns);
+          p.InnerText = config;
+          el.AppendChild(p);
+          
+          p = xd.CreateElement("Platform", Ns);
+          p.InnerText = platform;
+          el.AppendChild(p);
+          
+          pConfigs.AppendChild(el);
+        }
+        
+        foreach(XmlElement orig in xd.DocumentElement.SelectNodes("//q:*[@Condition]", NsMgr))
+        {
+          string condition = orig.GetAttribute("Condition");
+          if (!condition.EndsWith("|Win32'"))
+              continue;
+              
+          XmlElement cl = (XmlElement)orig.CloneNode(true);
+          cl.SetAttribute("Condition", condition.Replace("|Win32", "|" + platform));
+          
+          // TODO: Fix Win32 -> x64
+          
+          orig.ParentNode.InsertAfter(cl, orig);
+        }
     }
 }
 ]]></Code>
