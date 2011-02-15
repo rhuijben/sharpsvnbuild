@@ -66,6 +66,7 @@ s|\\inc64|\inc32|"
       <ResultFiles Include="$(PyResultDir)/*.exe" />
       <ResultFiles Include="$(PyResultDir)/*.dll" />
       <ResultFiles Include="$(PyResultDir)/*.pyd" />
+      <ResultFiles Include="$(PyResultDir)/*.pdb" />
       <ResultLibFiles Include="../requirements/python/Lib/**/*.*" />
     </ItemGroup>
     <Copy
