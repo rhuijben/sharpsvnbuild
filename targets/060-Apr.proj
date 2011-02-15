@@ -44,6 +44,62 @@
     <MSBuild Projects="@(AprProj)" 
              Properties="Platform=$(Platform)"
              />
+
+    <PropertyGroup>
+      <ResultSubDir Condition="'$(Platform)'=='Win32'"></ResultSubDir>
+      <ResultSubDir Condition="'$(Platform)'=='x64'">x64\</ResultSubDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <ResultFiles Include="../requirements/httpd/srclib/apr/$(ResultSubDir)**/*.dll" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr/$(ResultSubDir)**/*.exp" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr/$(ResultSubDir)**/*.lib" />      
+      <ResultFiles Include="../requirements/httpd/srclib/apr/$(ResultSubDir)**/*.pdb" />
+      
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/$(ResultSubDir)**/*.dll" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/$(ResultSubDir)**/*.exp" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/$(ResultSubDir)**/*.lib" />      
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/$(ResultSubDir)**/*.pdb" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.dll" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.exp" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.lib" />      
+      <ResultFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.pdb" />
+      
+      <ResultFiles Include="../requirements/httpd/srclib/apr-iconv/$(ResultSubDir)**/*.dll" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-iconv/$(ResultSubDir)**/*.exp" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-iconv/$(ResultSubDir)**/*.lib" />      
+      <ResultFiles Include="../requirements/httpd/srclib/apr-iconv/$(ResultSubDir)**/*.pdb" />
+      <ResultFiles Include="../requirements/httpd/srclib/apr-iconv/$(ResultSubDir)**/*.so" />
+      
+      <XmlFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.dll" />
+      <XmlFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.exp" />
+      <XmlFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.lib" />      
+      <XmlFiles Include="../requirements/httpd/srclib/apr-util/xml/expat/lib/$(ResultSubDir)**/*.pdb" />
+    </ItemGroup>
+
+    <Copy
+        SourceFiles="@(ResultFiles)"
+        DestinationFiles="@(ResultFiles->'../requirements/apr/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
+      
+    <Copy
+        Condition="'$(Platform)' != 'Win32'"
+        SourceFiles="@(ResultFiles)"
+        DestinationFiles="@(ResultFiles->'../requirements/httpd/srclib/apr/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
+    <Copy
+        Condition="'$(Platform)' != 'Win32'"
+        SourceFiles="@(ResultFiles)"
+        DestinationFiles="@(ResultFiles->'../requirements/httpd/srclib/apr-util/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
+    <Copy
+        SourceFiles="@(XmlFiles)"
+        DestinationFiles="@(XmlFiles->'../requirements/httpd/srclib/apr-util/Release/%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
+
     <Touch
         Files="../requirements/$(MSBuildProjectName).done"
         AlwaysCreate="true"
