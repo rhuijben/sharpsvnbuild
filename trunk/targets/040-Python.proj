@@ -68,6 +68,7 @@ s|\\inc64|\inc32|"
       <ResultFiles Include="$(PyResultDir)/*.pyd" />
       <ResultFiles Include="$(PyResultDir)/*.pdb" />
       <ResultLibFiles Include="../requirements/python/Lib/**/*.*" />
+      <ResultLibs Include="$(PyResultDir)/*.lib" />
     </ItemGroup>
     <Copy
         SourceFiles="@(ResultFiles)"
@@ -79,7 +80,11 @@ s|\\inc64|\inc32|"
         DestinationFiles="@(ResultLibFiles->'../requirements/bin/Lib/%(RecursiveDir)%(Filename)%(Extension)')"
         OverwriteReadOnlyFiles="true"
       />
-
+    <Copy
+        SourceFiles="@(ResultLibs)"
+        DestinationFolder="../requirements/python/libs"
+        OverwriteReadOnlyFiles="true"
+      />
     <Touch
         Files="../requirements/$(MSBuildProjectName).done"
         AlwaysCreate="true"
