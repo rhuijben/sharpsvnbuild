@@ -32,7 +32,26 @@
         Projects="..\requirements\httpd\apache.msbuildproj" 
         Targets="httpd;htpasswd;mod_dav;mod_auth_basic;mod_authn_file;mod_mime;mod_alias;mod_log_config"
         Properties="Platform=$(Platform)"
-     />
+      />
+    <ItemGroup>
+      <HttpdLibs Include="../requirements/httpd/release/*.lib" />
+      <HttpdLibs Include="../requirements/httpd/srclib/apr/release/*.lib" />
+      <HttpdLibs Include="../requirements/httpd/srclib/apr-util/release/*.lib" />
+      <HttpdLibs Include="../requirements/httpd/srclib/apr-iconv/release/*.lib" />
+      <HttpdIncludes Include="../requirements/httpd/srclib/apr/include/**/*.h" />
+      <HttpdIncludes Include="../requirements/httpd/srclib/apr-util/include/**/*.h" />
+      <HttpdIncludes Include="../requirements/httpd/srclib/apr-iconv/include/**/*.h" />
+    </ItemGroup>
+    <Copy
+        SourceFiles="@(HttpdLibs)"
+        DestinationFolder="../requirements/httpd/lib"
+        OverwriteReadOnlyFiles="true"
+      />
+    <Copy
+        SourceFiles="@(HttpdIncludes)"
+        DestinationFiles="@(HttpdIncludes->'../requirements/httpd/include/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />
     <Touch
         Files="../requirements/$(MSBuildProjectName).done"
         AlwaysCreate="true"
