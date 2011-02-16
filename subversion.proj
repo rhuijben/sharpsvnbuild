@@ -105,6 +105,14 @@
       <Sha1>4e1338497b8da50b84307191bb3418e9ec5715d7</Sha1>
       <PackageRoot>*</PackageRoot>
     </Package>
+    <Package Include="$(BuildDir)/modpython">
+      <Name>modpythod</Name>
+      <Version>3.3.1</Version>
+      <Type>download</Type>
+      <Url>http://archive.apache.org/dist/httpd/modpython/mod_python-3.3.1.tgz</Url>
+      <Sha1>e538170fd78e09408b6d8593da980b126a0fef93</Sha1>
+      <PackageRoot>*</PackageRoot>
+    </Package>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\targets\Master.targets" />
 </Project> 

@@ -69,6 +69,7 @@ s|\\inc64|\inc32|"
       <ResultFiles Include="$(PyResultDir)/*.pdb" />
       <ResultLibFiles Include="../requirements/python/Lib/**/*.*" />
       <ResultLibs Include="$(PyResultDir)/*.lib" />
+      <ResultIncludes Include="../requirements/python/pc/pyconfig.h" />
     </ItemGroup>
     <Copy
         SourceFiles="@(ResultFiles)"
@@ -85,6 +86,12 @@ s|\\inc64|\inc32|"
         DestinationFolder="../requirements/python/libs"
         OverwriteReadOnlyFiles="true"
       />
+    <Copy
+        SourceFiles="@(ResultIncludes)"
+        DestinationFolder="../requirements/python/include"
+        OverwriteReadOnlyFiles="true"
+      />
+
     <Touch
         Files="../requirements/$(MSBuildProjectName).done"
         AlwaysCreate="true"

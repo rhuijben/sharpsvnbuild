@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <OldProjects Include="..\requirements\modpython\src\*.vcproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Projects Include="..\requirements\modpython\src\mod_python.vcxproj" />
+  </ItemGroup>
+  <Import Project="../tasks/Replace.targets"/>
+
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
+
+    <Replace Targets="@(OldProjects)" Commands="
+s|Win32&quot;|$(Platform)&quot;|
+s|/MACHINE:I386||
+s|apr\.lib|apr-1.lib|
+s|aprutil\.lib|aprutil-1.lib|
+s|&lt;/Files|&lt;File RelativePath=&quot;.\finfoobject.c&quot;&gt;&lt;/File&gt;&lt;/Files|
+"
+      />
+      
+    <Replace Targets="../requirements/modpython/src/connobject.c" Commands="
+s|APR_BRIGADE_SENTINEL\(b\)|APR_BRIGADE_SENTINEL(bb)|
+"
+      />
+    <Exec WorkingDirectory="../requirements/modpython" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
+          Command="vcupgrade.exe /nologo %(OldProjects.fullpath)" />
+    
+    <!-- Somehow python expects XXX64 directories in openssl, while building openssl in 64 bit creates XXX32 -->
+    
+    <MSBuild Projects="@(Projects)"
+             Properties="APACHESRC=../../httpd;
+                         PYTHONSRC=../../python;
+                         Platform=$(Platform);
+                         Configuration=$(Configuration)"
+      />
+
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
+      />
+  </Target>
+  <Target Name="clean">
+  </Target>
+</Project>
