@@ -155,6 +155,31 @@ public class Download : Microsoft.Build.Utilities.Task
         
       fz.ExtractZip(_toFile, expandTo, null);
       
+      string moveFromDir = null;
+      if (!string.IsNullOrEmpty(PackageRoot))
+      {
+         string[] names = Directory.GetDirectories(expandTo, PackageRoot);
+         
+         if (names != null && names.Length == 1)
+            moveFromDir = Path.GetFullPath(names[0]);
+         else
+         {
+            Log.LogError("Can't find single subdir in {0} with filter {1}", expandTo, PackageRoot);
+            return false;
+         }
+         
+         foreach(string item in Directory.GetFiles(moveFromDir))
+         {
+              File.Move(item, Path.Combine(expandTo, Path.GetFileName(item)));
+         }
+         foreach(string item in Directory.GetDirectories(moveFromDir))
+         {
+              Directory.Move(item, Path.Combine(expandTo, Path.GetFileName(item)));
+         }
+         Directory.Delete(moveFromDir);
+      }
+     
+      
       return DoRemove();
     }
     
