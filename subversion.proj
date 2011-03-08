@@ -120,6 +120,7 @@
       <Url>http://surfnet.dl.sourceforge.net/project/mod-auth-sspi/mod-auth-sspi/mod_auth_sspi%201.0.4/mod_auth_sspi-1.0.4-2.2.2.zip</Url>
       <Sha1>305a7cfe32a0ea4559e1c2c3dc4b6e9a50aff6eb</Sha1>
       <PackageRoot>*</PackageRoot>
+      <Exclude>bin</Exclude>
     </Package>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\targets\Master.targets" />
