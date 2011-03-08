@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetName>mod_auth_sspi</TargetName>
+    <OutputPath>requirements/mod_auth_sspi</OutputPath>
+  </PropertyGroup>
+  <Import Project="../tasks/DswToMSBuild.targets"/>
+  <Import Project="../tasks/Replace.targets"/>  
+
+  <ItemGroup>
+    <OldProjects Include="..\requirements\mod_auth_sspi\src\ApacheModuleAuthSspi-2.2.dsp" />
+  </ItemGroup>
+  
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
+
+    <Exec WorkingDirectory="../requirements/httpd" Condition="!Exists('%(RootDir)%(Directory)%(Filename).vcxproj')"
+          Command="vcupgrade.exe /nologo /nocolor %(OldProjects.fullpath)" />
+         
+    <!-- Fix up version and platform compatibility --> 
+    <Replace Targets="..\requirements\mod_auth_sspi\src\ApacheModuleAuthSspi-2.2.vcxproj" Commands="
+s|Win32|$(Platform)|
+s|..[/\\]httpd-([0-9]+\.)+[0-9]+|httpd|
+"
+      />
+      
+    <!-- Copy the version file to fix resource generation -->
+    <Copy
+        SourceFiles="..\requirements\mod_auth_sspi\src\mod_auth_sspi_ver.h"
+        DestinationFiles="..\requirements\mod_auth_sspi\src\version.h"
+        OverwriteReadOnlyFiles="true"
+      />
+
+    <MSBuild Projects="..\requirements\mod_auth_sspi\src\ApacheModuleAuthSspi-2.2.vcxproj" 
+             Properties="Platform=$(Platform);Configuration=$(Configuration)"
+             />
+
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
+      />
+  </Target>
+  <Target Name="clean">
+  </Target>
+</Project>
