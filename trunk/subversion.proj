@@ -69,10 +69,10 @@
     </Package>
     <Package Include="$(BuildDir)/httpd">
       <Name>httpd</Name>
-      <Version>2.2.16</Version>
+      <Version>2.2.17</Version>
       <Type>download</Type>
-      <Url>http://archive.apache.org/dist/httpd/httpd-2.2.16.tar.bz2</Url>
-      <Sha1>ef92f5b3124fe5e9ba6121ea7f4bab8c014068f9</Sha1>
+      <Url>http://archive.apache.org/dist/httpd/httpd-2.2.17.tar.bz2</Url>
+      <Sha1>5c9b44620dee449a86ba1bcba1715033c2c26b08</Sha1>
       <!-- srcdir contains packaged apr, apr-util -->
       <Exclude>srclib/apr;srclib/apr-util</Exclude>
     </Package>

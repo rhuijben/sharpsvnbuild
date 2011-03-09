@@ -5,6 +5,7 @@
     <OutputPath>requirements/httpd</OutputPath>
   </PropertyGroup>
   <Import Project="../tasks/DswToMSBuild.targets"/>
+  <Import Project="../tasks/Replace.targets"/>
 
   <ItemGroup>
     <OldProjects Include="..\requirements\httpd\**\*.dsp" />
@@ -21,17 +22,99 @@
     <AprProj Include="..\requirements\httpd\srclib\apr-util\xml\expat\lib\xml.vcxproj" />
     <AprProj Include="..\requirements\httpd\srclib\apr-util\aprutil.vcxproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <HttpdModuleProjects Include="..\requirements\httpd\modules\**\*.vcxproj" />
+  </ItemGroup>
 
   <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
     <DswToMSBuild
         SlnFile="..\requirements\httpd\apache.dsw"
         EnsurePlatform="$(Platform)"
      />
+     
+    <!-- Fix external project references -->
+    <Replace Targets="@(HttpdModuleProjects)" Commands="
+s|..[/\\]srclib[/\\]zlib|../../zlib|
+s|..[/\\]srclib[/\\]openssl|../../openssl|
+"
+      />
 
     <MSBuild
         Projects="..\requirements\httpd\apache.msbuildproj" 
-        Targets="httpd;htpasswd;mod_dav;mod_auth_basic;mod_authn_file;mod_mime;mod_alias;mod_log_config"
-        Properties="Platform=$(Platform)"
+        Properties="Platform=$(Platform);Configuration=$(Configuration)"
+        Targets=" httpd;
+                  htpasswd;
+        
+                  mod_actions;
+                  mod_alias;
+                  mod_asis;
+                  mod_authnz_ldap;
+                  mod_authn_alias;
+                  mod_authn_anon;
+                  mod_authn_dbd;
+                  mod_authn_dbm;
+                  mod_authn_default;
+                  mod_authn_file;
+                  mod_authz_dbm;
+                  mod_authz_default;
+                  mod_authz_groupfile;
+                  mod_authz_host;
+                  mod_authz_owner;
+                  mod_authz_user;
+                  mod_auth_basic;
+                  mod_auth_digest;
+                  mod_autoindex;
+                  mod_cache;
+                  mod_cern_meta;
+                  mod_cgi;
+                  mod_charset_lite;
+                  mod_dav;
+                  mod_dav_fs;
+                  mod_dav_lock;
+                  mod_dbd;
+                  mod_deflate;
+                  mod_dir;
+                  mod_disk_cache;
+                  mod_dumpio;
+                  mod_env;
+                  mod_expires;
+                  mod_ext_filter;
+                  mod_file_cache;
+                  mod_filter;
+                  mod_headers;
+                  mod_ident;
+                  mod_imagemap;
+                  mod_include;
+                  mod_info;
+                  mod_isapi;
+                  mod_ldap;
+                  mod_logio;
+                  mod_log_config;
+                  mod_log_forensic;
+                  mod_mem_cache;
+                  mod_mime;
+                  mod_mime_magic;
+                  mod_negotiation;
+                  mod_proxy;
+                  mod_proxy_ajp;
+                  mod_proxy_balancer;
+                  mod_proxy_connect;
+                  mod_proxy_ftp;
+                  mod_proxy_http;
+                  mod_proxy_scgi;
+                  mod_reqtimeout;
+                  mod_rewrite;
+                  mod_setenvif;
+                  mod_speling;
+                  mod_ssl;
+                  mod_status;
+                  mod_substitute;
+                  mod_unique_id;
+                  mod_userdir;
+                  mod_usertrack;
+                  mod_version;
+                  mod_vhost_alias"        
       />
     <ItemGroup>
       <HttpdLibs Include="../requirements/httpd/release/*.lib" />
