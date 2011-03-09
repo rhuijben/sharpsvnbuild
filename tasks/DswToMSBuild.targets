@@ -209,10 +209,8 @@ public class DswToMSBuild : Microsoft.Build.Utilities.Task
                         xw.WriteAttributeString("Projects", ResultName(p.Value[0]));
                         
                         xw.WriteAttributeString("Targets", string.IsNullOrEmpty(suffix) ? "Build" : suffix.Substring(1));
-                        xw.WriteAttributeString("Properties", "Configuration=" + config + "; Platform=" + platform);
                         xw.WriteAttributeString("ToolsVersion", "$" + "(ProjectToolsVersion)");
-                        xw.WriteAttributeString("UnloadProjectsOnCompletion", "$" + "(UnloadProjectsOnCompletion)");
-                        xw.WriteAttributeString("UseResultsCache", "$" + "(UseResultsCache)");
+                        xw.WriteAttributeString("Properties", "Configuration=" + config + "; Platform=" + platform);
                         xw.WriteEndElement();
                         xw.WriteEndElement();
                     }
