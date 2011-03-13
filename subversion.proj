@@ -122,6 +122,14 @@
       <PackageRoot>*</PackageRoot>
       <Exclude>bin</Exclude>
     </Package>
+    <Package Include="$(BuildDir)/swigwin">
+      <Name>swigwin</Name>
+      <Version>2.0.2</Version>
+      <Type>download</Type>
+      <Url>http://surfnet.dl.sourceforge.net/project/swig/swigwin/swigwin-2.0.2/swigwin-2.0.2.zip</Url>
+      <Sha1>a13e4dd88d0f689e471cba34b18bea5080fa11b4</Sha1>
+      <PackageRoot>*</PackageRoot>
+    </Package>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\targets\Master.targets" />
 </Project> 
