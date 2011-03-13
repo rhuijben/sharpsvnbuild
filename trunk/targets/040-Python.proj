@@ -63,7 +63,8 @@ s|\\inc64|\inc32|"
       <PyResultDir Condition="'$(Platform)'=='x64'">../requirements/python/PCBuild/amd64</PyResultDir>
     </PropertyGroup>
     <ItemGroup>
-      <ResultFiles Include="$(PyResultDir)/*.exe" />
+      <ResultFiles Include="$(PyResultDir)/python*.exe" />
+      <ResultFiles Include="$(PyResultDir)/w9xpopen.exe" />
       <ResultFiles Include="$(PyResultDir)/*.dll" />
       <ResultFiles Include="$(PyResultDir)/*.pyd" />
       <ResultFiles Include="$(PyResultDir)/*.pdb" />
@@ -80,7 +81,13 @@ s|\\inc64|\inc32|"
         SourceFiles="@(ResultLibFiles)"
         DestinationFiles="@(ResultLibFiles->'../requirements/bin/Lib/%(RecursiveDir)%(Filename)%(Extension)')"
         OverwriteReadOnlyFiles="true"
+      />      
+    <Copy
+        SourceFiles="@(ResultLibs)"
+        DestinationFolder="../requirements/bin/libs"
+        OverwriteReadOnlyFiles="true"
       />
+      
     <Copy
         SourceFiles="@(ResultLibs)"
         DestinationFolder="../requirements/python/libs"
