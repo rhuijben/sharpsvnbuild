@@ -62,10 +62,10 @@
     </Package>
     <Package Include="$(BuildDir)/serf">
       <Name>Serf</Name>
-      <Version>0.7.1</Version>
+      <Version>0.7.2</Version>
       <Type>download</Type>
-      <Url>http://serf.googlecode.com/files/serf-0.7.1.tar.bz2</Url>
-      <Sha1>f9f68aa3e8a3e2b9141e841c6414799443c2f194</Sha1>
+      <Url>http://serf.googlecode.com/files/serf-0.7.2.tar.bz2</Url>
+      <Sha1>132fbb13d50c4f849231eee79dcada8cde3ecad2</Sha1>
     </Package>
     <Package Include="$(BuildDir)/httpd">
       <Name>httpd</Name>
