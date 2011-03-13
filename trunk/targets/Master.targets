@@ -21,7 +21,7 @@
   </ItemGroup>
   <Target Name="Build" DependsOnTargets="Download">
     <MakeDir Directories="requirements/bin" />
-    <SetEnvVar Variable="PATH" Value="$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/requirements/bin'));$(Path)" />    
+    <SetEnvVar Variable="PATH" Value="$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/requirements/bin'));$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/requirements/perl'));$(Path)" />
     <MSBuild
         Projects="@(ProjectFile)"
         Properties="Configuration=$(Configuration);Platform=$(Platform)"
