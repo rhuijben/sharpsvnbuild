@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <OldProjects Include="..\requirements\python\pcbuild\*.vcproj" />
+  </ItemGroup>
+  <Import Project="../tasks/Replace.targets"/>
+
+  <ItemGroup>
+    <PythonLib Include="..\requirements\python\include\*.h" />
+  </ItemGroup>  
+  <ItemGroup>
+    <PerlLib Include="..\requirements\perl\lib\CORE\**\*.h" />
+  </ItemGroup>
+
+  <Target Name="Build" DependsOnTargets="" Condition="!Exists('../requirements/$(MSBuildProjectName).done')">
+    <Copy
+        SourceFiles="@(PythonLib)"
+        DestinationFolder="../requirements/swigwin/lib/python"
+      />
+    <Copy
+        SourceFiles="@(PerlLib)"
+        DestinationFiles="@(PerlLib->'../requirements/swigwin/lib/perl5/%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+      />    
+    <Touch
+        Files="../requirements/$(MSBuildProjectName).done"
+        AlwaysCreate="true"
+      />
+  </Target>
+  <Target Name="clean">
+  </Target>
+</Project>
