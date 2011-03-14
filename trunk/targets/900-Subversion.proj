@@ -24,7 +24,9 @@
       <GenArgs>$(GenArgs) "--with-zlib=../requirements/zlib" --enable-ml</GenArgs>
       
       <GenArgs>$(GenArgs) "--with-neon=../requirements/neon"</GenArgs>
-      <GenArgs>$(GenArgs) "--with-serf=../requirements/serf"</GenArgs>     
+      <GenArgs>$(GenArgs) "--with-serf=../requirements/serf"</GenArgs>
+      
+      <GenArgs>$(GenArgs) "--with-swig=../requirements/swigwin"</GenArgs>
     </PropertyGroup>
     
     <Exec
@@ -34,7 +36,7 @@
   
   <Target Name="Build" DependsOnTargets="GenMake">
     
-    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="__ALL_TESTS__"/>
+    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="__ALL_TESTS__;__SWIG_PYTHON__"/>
   </Target>
   <Target Name="Clean" DependsOnTargets="GenMake">
     <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="clean"/>
