@@ -34,6 +34,10 @@
       
       <GenArgs>$(GenArgs) "--with-swig=../requirements/swigwin"</GenArgs>
       <GenArgs Condition="'$(JavaHome)' != ''">$(GenArgs) "--with-jdk=$(JavaHome)"</GenArgs>
+      
+      <SvnTargets>__ALL__</SvnTargets>
+      <SvnTargets>$(SvnTargets);__SWIG_PYTHON__</SvnTargets>
+      <SvnTargets Condition="'$(JavaHome)' != ''">$(SvnTargets);__JAVAHL__</SvnTargets>
     </PropertyGroup>
     
     <Exec
@@ -43,7 +47,7 @@
   
   <Target Name="Build" DependsOnTargets="GenMake">
     
-    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="__ALL_TESTS__;__SWIG_PYTHON__"/>
+    <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="$(SvnTargets)"/>
   </Target>
   <Target Name="Clean" DependsOnTargets="GenMake">
     <MSBuild Projects="..\subversion\subversion_vcnet.sln" Targets="clean"/>
