@@ -4,13 +4,19 @@
     <TargetName>svn</TargetName>
     <OutputPath>subversion</OutputPath>
   </PropertyGroup>
-  
+  <Import Project="../tasks/FindJavaSdk.targets" />
+    
   <Target Name="CheckoutSvn" Condition="!Exists('../subversion')">
     <Exec WorkingDirectory=".."
           Command='svn co http://svn.apache.org/repos/asf/subversion/trunk subversion' />
   </Target>
 
   <Target Name="GenMake" DependsOnTargets="CheckoutSvn">
+  
+    <FindJavaSdk>
+      <Output TaskParameter="JavaHome" PropertyName="JavaHome"/>
+    </FindJavaSdk>
+  
     <PropertyGroup>
       <GenArgs>gen-make.py -t vcproj --vsnet-version=2010</GenArgs>
       <GenArgs>$(GenArgs) --release</GenArgs>
@@ -27,6 +33,7 @@
       <GenArgs>$(GenArgs) "--with-serf=../requirements/serf"</GenArgs>
       
       <GenArgs>$(GenArgs) "--with-swig=../requirements/swigwin"</GenArgs>
+      <GenArgs Condition="'$(JavaHome)' != ''">$(GenArgs) "--with-jdk=$(JavaHome)"</GenArgs>
     </PropertyGroup>
     
     <Exec

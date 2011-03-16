@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="FindJavaSdk" TaskFactory="CodeTaskFactory" 
+      AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <JavaHome ParameterType="System.String" Output="true" />
+
+
+
+
+
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Framework.dll"/>
+      <Reference Include="$(MSBuildBinPath)\Microsoft.Build.Utilities.v4.0.dll"/>
+
+
+      <Code Type="Class" Language="cs">
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+using Microsoft.Win32;
+
+public class FindJavaSdk : Task
+{
+    [Output]
+    public string JavaHome { get; set; }
+
+    public override bool Execute()
+    {
+        List<string> keys = new List<string>();
+        
+        using(RegistryKey jdk = Registry.LocalMachine.OpenSubKey("SOFTWARE\\JavaSoft\\Java Development Kit"))
+        {
+            if (jdk == null)
+            {
+                JavaHome = "";
+                return true;
+            }
+            
+            string[] subkeys = jdk.GetSubKeyNames();
+            if (subkeys != null)
+              keys.AddRange(subkeys);
+            keys.Sort();
+            
+            string current = jdk.GetValue("CurrentVersion") as string;
+            
+            if (string.IsNullOrEmpty(current) || !keys.Contains(current))
+            {
+                foreach (string v in subkeys)
+                {
+                    using(RegistryKey r = jdk.OpenSubKey(v))
+                    {
+                        string home = r.GetValue("JavaHome") as string;
+
+                        if (!String.IsNullOrEmpty(home) && Directory.Exists(home))
+                        {
+                            current = v;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (string.IsNullOrEmpty(current))
+            {
+                JavaHome = "";
+                return true;
+            }
+            
+            using (RegistryKey rr = jdk.OpenSubKey(current))
+                JavaHome = (rr.GetValue("JavaHome") as string) ?? "";
+                
+            return true;
+        }
+    }
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+</Project>
